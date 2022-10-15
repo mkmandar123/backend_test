@@ -7,9 +7,7 @@ export class GroupController {
   private groupRepository = getRepository(Group)
 
   async allGroups(request: Request, response: Response, next: NextFunction) {
-    // Task 1:
-
-    // Return the list of all groups
+    return this.groupRepository.find();
   }
 
   async createGroup(request: Request, response: Response, next: NextFunction) {
@@ -37,17 +35,34 @@ export class GroupController {
     }
 
     const group = await this.groupRepository.findOne(params.id);
+    if (!group) {
+      response.status(400);
+      return `Group with given ID not found.`;
+    }
     group.prepareToUpdate(request.body);
     return this.groupRepository.save(group);
   }
 
   async removeGroup(request: Request, response: Response, next: NextFunction) {
-    // Task 1:
+    const { body: params } = request
 
-    // Delete a Group
+    const requiredFields = ['id'];
+    const missingFields = CommonHelper.getMissingFields(requiredFields, Object.keys(params));
+    if (missingFields.length) {
+      response.status(400);
+      return `Required fields: ${ missingFields } missing.`;
+    }
+
+    const group = await this.groupRepository.findOne(params.id);
+    if (!group) {
+      response.status(400);
+      return `Group with given ID not found.`;
+    }
+    return this.groupRepository.delete(group);
   }
 
   async getGroupStudents(request: Request, response: Response, next: NextFunction) {
+
     // Task 1:
 
     // Return the list of Students that are in a Group
