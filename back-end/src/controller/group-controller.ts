@@ -13,8 +13,9 @@ export class GroupController {
   }
 
   async createGroup(request: Request, response: Response, next: NextFunction) {
+    const { body: params } = request
     const requiredFields = ['name', 'number_of_weeks', 'roll_states', 'incidents', 'ltmt'];
-    const missingFields = CommonHelper.getMissingFields(requiredFields, Object.keys(request.body));
+    const missingFields = CommonHelper.getMissingFields(requiredFields, Object.keys(params));
     if (missingFields.length) {
       response.status(400);
       return `Required fields: ${ missingFields } missing.`;
@@ -26,9 +27,18 @@ export class GroupController {
   }
 
   async updateGroup(request: Request, response: Response, next: NextFunction) {
-    // Task 1:
+    const { body: params } = request
 
-    // Update a Group
+    const requiredFields = ['id'];
+    const missingFields = CommonHelper.getMissingFields(requiredFields, Object.keys(params));
+    if (missingFields.length) {
+      response.status(400);
+      return `Required fields: ${ missingFields } missing.`;
+    }
+
+    const group = await this.groupRepository.findOne(params.id);
+    group.prepareToUpdate(request.body);
+    return this.groupRepository.save(group);
   }
 
   async removeGroup(request: Request, response: Response, next: NextFunction) {
